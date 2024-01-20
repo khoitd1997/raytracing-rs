@@ -1,4 +1,18 @@
-use raytracing_rs::vec3::bar;
+use raytracing_rs::vec3::Vec3;
+
+type Color = Vec3;
+
+fn write_color(out: &mut String, pixel_color: &Color) {
+    out.push_str(
+        format!(
+            "{} {} {}\n",
+            (255.999 * pixel_color.x()) as i32,
+            (255.999 * pixel_color.y()) as i32,
+            (255.999 * pixel_color.z()) as i32,
+        )
+        .as_str(),
+    )
+}
 
 fn main() {
     let image_width = 256;
@@ -13,11 +27,11 @@ fn main() {
             let g = (j as f64) / ((image_height - 1) as f64);
             let b = 0 as f64;
 
-            let ir = (255.999 * r) as i32;
-            let ig = (255.999 * g) as i32;
-            let ib = (255.999 * b) as i32;
+            let pixel_color = Color::new(r, g, b);
+            let mut out_str = String::new();
+            write_color(&mut out_str, &pixel_color);
 
-            println!("{ir} {ig} {ib}");
+            println!("{}", out_str);
         }
         eprint!("\rDone.              \n");
     }

@@ -12,13 +12,20 @@ pub struct Vec3 {
     pub e: (f64, f64, f64),
 }
 
-impl Neg for Vec3 {
-    type Output = Self;
+impl Neg for &Vec3 {
+    type Output = Vec3;
 
     fn neg(self) -> Self::Output {
         Vec3 {
             e: (-self.x(), -self.y(), -self.z()),
         }
+    }
+}
+impl Neg for Vec3 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        -(&self)
     }
 }
 

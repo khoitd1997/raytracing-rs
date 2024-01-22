@@ -1,7 +1,12 @@
 use raytracing_rs::{
+    hittable::HitRecord,
+    hittable_list::HittableList,
     ray::Ray,
+    rtweekend::INFINITY,
+    sphere::Sphere,
     vec3::{Point3, Vec3},
 };
+use std::{cell::RefCell, rc::Rc};
 
 type Color = Vec3;
 
@@ -17,18 +22,10 @@ fn write_color(out: &mut String, pixel_color: &Color) {
     )
 }
 
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> bool {
-    let oc = r.origin() - center;
-    let a = r.direction().dot(&(r.direction()));
-    let b = 2.0 * oc.dot(&(r.direction()));
-    let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    discriminant >= 0.0
-}
-
-fn ray_color(r: &Ray) -> Color {
-    if hit_sphere(&(Point3::new(0.0, 0.0, -1.0)), 0.5, r) {
-        return Color::new(1.0, 0.0, 0.0);
+fn ray_color(r: &Ray, world: &HittableList) -> Color {
+    let mut rec = HitRecord::new();
+    if world.hit(r, 0.0, INFINITY, &mut rec) {
+        return (rec.normal + Color::new(1.0, 1.0, 1.0)) * 0.5;
     }
 
     let unit_direction = r.direction().unit_vector();
@@ -47,6 +44,16 @@ fn main() {
     } else {
         image_height_temp
     };
+
+    let mut world = HittableList::new();
+    world.add(Rc::new(RefCell::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+    ))));
+    world.add(Rc::new(RefCell::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+    ))));
 
     // Camera
     let focal_length = 1.0;
@@ -76,7 +83,7 @@ fn main() {
                 pixel00_loc + (pixel_delta_u * (i as f64)) + (pixel_delta_v * (j as f64));
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(&camera_center, &ray_direction);
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             let mut out_str = String::new();
             write_color(&mut out_str, &pixel_color);
 

@@ -22,10 +22,10 @@ impl Neg for Vec3 {
     }
 }
 
-impl Add for Vec3 {
-    type Output = Self;
+impl Add<&Vec3> for Vec3 {
+    type Output = Vec3;
 
-    fn add(self, other: Self) -> Self::Output {
+    fn add(self, other: &Vec3) -> Self::Output {
         Vec3 {
             e: (
                 self.x() + other.x(),
@@ -35,11 +35,18 @@ impl Add for Vec3 {
         }
     }
 }
+impl Add for Vec3 {
+    type Output = Vec3;
 
-impl Sub for Vec3 {
+    fn add(self, other: Self) -> Self::Output {
+        self + (&other)
+    }
+}
+
+impl Sub<&Vec3> for Vec3 {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self::Output {
+    fn sub(self, other: &Self) -> Self::Output {
         Vec3 {
             e: (
                 self.x() - other.x(),
@@ -47,6 +54,13 @@ impl Sub for Vec3 {
                 self.z() - other.z(),
             ),
         }
+    }
+}
+impl Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        self - (&other)
     }
 }
 

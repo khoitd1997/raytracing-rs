@@ -1,6 +1,7 @@
 use super::hittable::{HitRecord, Hittable};
+use super::interval::Interval;
 use super::ray::Ray;
-use super::vec3::Point3;
+use super::vec3::{Point3, Vec3};
 
 pub struct Sphere {
     center: Point3,
@@ -8,19 +9,19 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(_center: Point3, _radius: f64) -> Self {
+    pub fn new(center: Point3, radius: f64) -> Self {
         Sphere {
-            center: _center,
-            radius: _radius,
+            center,
+            radius,
         }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let oc = r.origin() - self.center;
         let a = r.direction().length_squared();
-        let half_b = oc.dot(&(r.direction()));
+        let half_b = Vec3::dot(&oc, &(r.direction()));
         let c = oc.length_squared() - self.radius * self.radius;
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {
@@ -29,9 +30,9 @@ impl Hittable for Sphere {
 
         let sqrtd = discriminant.sqrt();
         let mut root = (-half_b - sqrtd) / a;
-        if root <= ray_tmin || ray_tmax <= root {
+        if !ray_t.surrounds(root) {
             root = (-half_b + sqrtd) / a;
-            if root <= ray_tmin || ray_tmax <= root {
+            if !ray_t.surrounds(root) {
                 return false;
             }
         }

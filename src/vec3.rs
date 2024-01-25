@@ -5,9 +5,11 @@ use std::ops::Neg;
 use std::ops::Sub;
 use std::string::ToString;
 
+use super::rtweekend::{random_double, random_double_range};
+
 pub type Point3 = Vec3;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Vec3 {
     pub e: (f64, f64, f64),
 }
@@ -112,6 +114,16 @@ impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 { e: (x, y, z) }
     }
+    pub fn new_random() -> Self {
+        Vec3::new(random_double(), random_double(), random_double())
+    }
+    pub fn new_random_range(min: f64, max: f64) -> Self {
+        Vec3::new(
+            random_double_range(min, max),
+            random_double_range(min, max),
+            random_double_range(min, max),
+        )
+    }
 
     pub fn x(&self) -> f64 {
         self.e.0
@@ -131,8 +143,8 @@ impl Vec3 {
         self.length_squared().sqrt()
     }
 
-    pub fn dot(&self, other: &Self) -> f64 {
-        self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
+    pub fn dot(lhs: &Self, rhs: &Self) -> f64 {
+        lhs.x() * rhs.x() + lhs.y() * rhs.y() + lhs.z() * rhs.z()
     }
 
     pub fn cross(&self, other: &Self) -> Self {
@@ -145,7 +157,33 @@ impl Vec3 {
         }
     }
 
-    pub fn unit_vector(&self) -> Self {
-        self.to_owned() / self.length()
+    #[inline(always)]
+    pub fn unit_vector(v: &Vec3) -> Self {
+        v.to_owned() / v.length()
+    }
+
+    #[inline(always)]
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Vec3::new_random_range(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    #[inline(always)]
+    pub fn random_unit_vector() -> Self {
+        Self::unit_vector(&(Self::random_in_unit_sphere()))
+    }
+
+    #[inline(always)]
+    pub fn random_on_hemisphere(normal: &Self) -> Self {
+        let on_unit_sphere = Self::random_unit_vector();
+        if Self::dot(&on_unit_sphere, normal) > 0.0 {
+            return on_unit_sphere;
+        } else {
+            return -on_unit_sphere;
+        }
     }
 }

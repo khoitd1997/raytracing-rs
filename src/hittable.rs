@@ -22,5 +22,12 @@ impl HitRecord {
 }
 
 pub trait Hittable {
+    ///
+    /// Check if object hits a ray
+    /// * `r` - Ray
+    /// * `ray_t` - Ray Interval
+    /// * `rec` - Hit record to modify
+    /// # Returns
+    /// Return true if it's hit
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
 }

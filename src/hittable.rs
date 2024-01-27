@@ -1,13 +1,29 @@
 use super::ray::Ray;
 use super::vec3::{Point3, Vec3};
 use super::interval::Interval;
+use super::material::{Material, Lambertian};
+use std::cell::RefCell;
+use std::rc::Rc;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
+    pub mat: Rc<RefCell<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self {
+            p: Point3::default(),
+            normal: Point3::default(),
+            mat: Rc::new(RefCell::new(Lambertian::default())),
+            t: 0.0,
+            front_face: false,
+        }
+    }
 }
 
 impl HitRecord {

@@ -1,18 +1,22 @@
 use super::hittable::{HitRecord, Hittable};
 use super::interval::Interval;
+use super::material::Material;
 use super::ray::Ray;
 use super::vec3::{Point3, Vec3};
+use std::{cell::RefCell, rc::Rc};
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    mat: Rc<RefCell<dyn Material>>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
+    pub fn new(center: Point3, radius: f64, mat: Rc<RefCell<dyn Material>>) -> Self {
         Sphere {
             center,
             radius,
+            mat,
         }
     }
 }
@@ -39,6 +43,7 @@ impl Hittable for Sphere {
 
         rec.t = root;
         rec.p = r.at(rec.t);
+        rec.mat = self.mat.clone();
         let outward_normal = (rec.p - self.center) / self.radius;
         rec.set_face_normal(r, &outward_normal);
 

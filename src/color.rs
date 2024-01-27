@@ -3,6 +3,10 @@ use super::interval::Interval;
 
 pub type Color = Vec3;
 
+fn linear_to_gamma(linear_component: f64) -> f64 {
+    return linear_component.sqrt();
+}
+
 pub fn write_color(out: &mut String, pixel_color: &Color, samples_per_pixel: i32) {
     let mut r = pixel_color.x();
     let mut g = pixel_color.y();
@@ -12,6 +16,11 @@ pub fn write_color(out: &mut String, pixel_color: &Color, samples_per_pixel: i32
     r *= scale;
     g *= scale;
     b *= scale;
+
+    // Apply the linear to gmma transform
+    r = linear_to_gamma(r);
+    g = linear_to_gamma(g);
+    b = linear_to_gamma(b);
 
     let intensity = Interval::new_val(0.0, 0.999);
 

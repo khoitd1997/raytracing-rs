@@ -113,8 +113,13 @@ impl Camera {
         if depth <= 0 { return Color{..Default::default()}; }
 
         if world.hit(r, Interval::new_val(0.001, INFINITY), &mut rec) {
-            let direction = rec.normal + Vec3::random_unit_vector();
-            return self.ray_color(&(Ray::new(&(rec.p), &direction)), depth - 1, world) * 0.5;
+            let mut scattered = Ray::default();
+            let mut attenuation = Color::default();
+            if rec.mat.borrow().scatter(r, &rec, &mut attenuation, &mut scattered) {
+                return self.ray_color(&scattered, depth - 1, world) * attenuation;
+            }
+
+            return Color::default();
         }
 
         let unit_direction = Vec3::unit_vector(&(r.direction()));

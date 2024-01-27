@@ -7,3 +7,4 @@ pub mod rtweekend;
 pub mod interval;
 pub mod camera;
 pub mod color;
+pub mod material;

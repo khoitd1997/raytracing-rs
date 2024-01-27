@@ -72,9 +72,16 @@ impl Sub for Vec3 {
         self - (&other)
     }
 }
+impl Sub<Vec3> for &Vec3 {
+    type Output = Vec3;
 
-impl Mul<f64> for Vec3 {
-    type Output = Self;
+    fn sub(self, other: Vec3) -> Self::Output {
+        self.to_owned() - (&other)
+    }
+}
+
+impl Mul<f64> for &Vec3 {
+    type Output = Vec3;
 
     fn mul(self, t: f64) -> Self::Output {
         Vec3 {
@@ -82,6 +89,14 @@ impl Mul<f64> for Vec3 {
         }
     }
 }
+impl Mul<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, t: f64) -> Self::Output {
+        (&self) * t
+    }
+}
+
 impl Mul for Vec3 {
     type Output = Self;
 
@@ -139,6 +154,11 @@ impl Vec3 {
         self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
     }
 
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        return (self.e.0.abs() < s) && (self.e.1.abs() < s) && (self.e.2.abs() < s);
+    }
+
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
@@ -185,5 +205,10 @@ impl Vec3 {
         } else {
             return -on_unit_sphere;
         }
+    }
+
+    #[inline(always)]
+    pub fn reflect(v: &Self, n: &Self) -> Self {
+        return v - (n * Self::dot(v, n));
     }
 }

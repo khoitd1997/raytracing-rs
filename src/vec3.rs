@@ -5,7 +5,7 @@ use std::ops::Neg;
 use std::ops::Sub;
 use std::string::ToString;
 
-use super::rtweekend::{random_double, random_double_range};
+use super::rtweekend::{partial_min, random_double, random_double_range};
 
 pub type Point3 = Vec3;
 
@@ -183,6 +183,16 @@ impl Vec3 {
     }
 
     #[inline(always)]
+    pub fn random_in_unit_disk() -> Self {
+        loop {
+            let p = Vec3::new(random_double_range(-1.0, 1.0), random_double_range(-1.0, 1.0), 0.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    #[inline(always)]
     pub fn random_in_unit_sphere() -> Self {
         loop {
             let p = Vec3::new_random_range(-1.0, 1.0);
@@ -210,5 +220,13 @@ impl Vec3 {
     #[inline(always)]
     pub fn reflect(v: &Self, n: &Self) -> Self {
         return v - (n * Self::dot(v, n));
+    }
+
+    #[inline(always)]
+    pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = partial_min(Vec3::dot(&(-uv), n), 1.0);
+        let r_out_perp = (*uv + (n * cos_theta)) * etai_over_etat;
+        let r_out_parallel = n * -(((-(r_out_perp.length_squared()) + 1.0).abs()).sqrt());
+        return r_out_perp + r_out_parallel;
     }
 }

@@ -3,20 +3,20 @@ use super::interval::Interval;
 use super::material::Material;
 use super::ray::Ray;
 use super::vec3::{Point3, Vec3};
-use std::{cell::RefCell, rc::Rc};
+use std::sync::Arc;
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Rc<RefCell<dyn Material>>,
+    mat:  Arc<Box<dyn Material + Sync + Send>>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat: Rc<RefCell<dyn Material>>) -> Self {
+    pub fn new(center: Point3, radius: f64, m: Box<dyn Material + Sync + Send>) -> Self {
         Sphere {
             center,
             radius,
-            mat,
+            mat: Arc::new(m),
         }
     }
 }

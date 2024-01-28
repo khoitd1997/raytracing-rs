@@ -9,9 +9,16 @@ pub fn degrees_to_radians(degrees: f64) -> f64 {
 
 pub fn random_double() -> f64 {
     let mut rng = rand::thread_rng();
-    rng.gen()
+    rng.gen_range(0.0..1.0)
 }
 
 pub fn random_double_range(min: f64, max: f64) -> f64 {
     min + (max - min) * random_double()
+}
+
+pub fn partial_min(lhs: f64, rhs: f64) -> f64 {
+    if lhs < rhs {
+        return lhs;
+    }
+    return rhs;
 }
